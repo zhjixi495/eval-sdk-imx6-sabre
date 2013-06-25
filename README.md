@@ -1,5 +1,5 @@
-eval-sdk-imx6
-=============
+eval-sdk-imx6-sabre
+===================
 
 RidgeRun Evaluation Linux SDK for Freescale i.MX6 Sabre-SDP.
 
