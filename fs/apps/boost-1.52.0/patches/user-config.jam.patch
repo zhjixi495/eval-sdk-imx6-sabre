@@ -1,0 +1,12 @@
+diff -Naur boost-1.49.0.orig/src/tools/build/v2/user-config.jam boost-1.49.0/src/tools/build/v2/user-config.jam
+--- boost-1.49.0.orig/src/tools/build/v2/user-config.jam	2012-04-27 12:12:34.715582439 -0700
++++ boost-1.49.0/src/tools/build/v2/user-config.jam	2012-04-27 15:17:45.413241884 -0700
+@@ -44,6 +44,8 @@
+ # Configure specific gcc version, giving alternative name to use.
+ # using gcc : 3.2 : g++-3.2 ;
+ 
++#Configure arm (From codeSourcery) version of gcc for cross compiling. 
++using gcc : arm : arm-none-linux-gnueabi-g++ ;
+ 
+ # -------------------
+ # MSVC configuration.

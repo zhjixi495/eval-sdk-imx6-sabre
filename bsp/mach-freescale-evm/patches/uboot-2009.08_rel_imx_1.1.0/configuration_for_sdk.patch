@@ -1,0 +1,239 @@
+Index: u-boot-2013.01/src/include/configs/mx6qsabre_common.h
+===================================================================
+--- u-boot-2013.01.orig/src/include/configs/mx6qsabre_common.h	2013-03-08 10:51:51.000000000 -0600
++++ u-boot-2013.01/src/include/configs/mx6qsabre_common.h	2013-06-19 11:42:23.949059194 -0600
+@@ -41,12 +41,11 @@
+ #define CONFIG_FSL_ESDHC
+ #define CONFIG_FSL_USDHC
+ #define CONFIG_SYS_FSL_ESDHC_ADDR      0
+-#define CONFIG_SYS_FSL_USDHC_NUM       2
+ 
+ #define CONFIG_MMC
+ #define CONFIG_CMD_MMC
+ #define CONFIG_GENERIC_MMC
+-#define CONFIG_MMC_BOUNCE_BUFFER
++#define CONFIG_BOUNCE_BUFFER
+ #define CONFIG_CMD_EXT2
+ #define CONFIG_CMD_FAT
+ #define CONFIG_DOS_PARTITION
+@@ -70,6 +69,7 @@
+ #define CONFIG_CONS_INDEX              1
+ #define CONFIG_BAUDRATE                        115200
+ 
++
+ /* Command definition */
+ #include <config_cmd_default.h>
+ 
+@@ -81,6 +81,9 @@
+ #define CONFIG_LOADADDR                        0x10800000
+ #define CONFIG_SYS_TEXT_BASE           0x17800000
+ 
++#define CONFIG_CMD_ENV                 /*Enable env command    */
++#define CONFIG_CMD_ASKENV              /*Enable askenv command */
++
+ #define CONFIG_EXTRA_ENV_SETTINGS \
+ 	"script=boot.scr\0" \
+ 	"uimage=uImage\0" \
+@@ -96,29 +99,41 @@
+ 		"fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
+ 	"bootscript=echo Running bootscript from mmc ...; " \
+ 		"source\0" \
+-	"loaduimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${uimage}\0" \
+-		"mmcboot=echo Booting from mmc ...; " \
+-		"run mmcargs; " \
+-		"bootm\0" \
++	"loaduimage=for dtype in sata mmc ; do " \
++			"for disk in 0 1 2 ; do ${dtype} dev ${disk} ;" \
++				"for fs in fat ext2 ; do " \
++					"${fs}load " \
++						"${dtype} ${disk}:1 " \
++						"${loadaddr} " \
++						"/uImage;" \
++				"done ; " \
++			"done ; " \
++		"done;\0 " \
+ 	"netargs=setenv bootargs console=${console},${baudrate} " \
+ 		"root=/dev/nfs " \
+ 		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+ 	"netboot=echo Booting from net ...; " \
+ 		"run netargs; " \
+ 		"dhcp ${uimage}; bootm\0" \
++	"loadaddr=0x12000000\0" \
++	"loadbootenv=for dtype in sata mmc ; do " \
++		"for disk in 0 1 2 ; do ${dtype} dev ${disk} ;" \
++			"for fs in fat ; do " \
++				"${fs}load " \
++					"${dtype} ${disk}:1 " \
++					"${loadaddr} " \
++					"/uEnv.txt;" \
++			"done ; " \
++		"done ; " \
++	"done;\0 " \
++	"importbootenv=echo Importing environment...; env import -t ${loadaddr} ${filesize}\0" \
+ 
+ #define CONFIG_BOOTCOMMAND \
+-	"mmc dev ${mmcdev};" \
+-	"if mmc rescan ${mmcdev}; then " \
+-		"if run loadbootscript; then " \
+-		"run bootscript; " \
+-		"else " \
+-			"if run loaduimage; then " \
+-				"run mmcboot; " \
+-			"else run netboot; " \
+-			"fi; " \
+-		"fi; " \
+-	"else run netboot; fi"
++		"run loadbootenv ;" \
++			"run importbootenv ; " \
++				"if test -n ${uenvcmd} ; then " \
++					"run uenvcmd; " \
++				"fi ;"
+ 
+ #define CONFIG_ARP_TIMEOUT     200UL
+ 
+@@ -128,7 +143,7 @@
+ #define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
+ #define CONFIG_SYS_PROMPT              "U-Boot > "
+ #define CONFIG_AUTO_COMPLETE
+-#define CONFIG_SYS_CBSIZE              256
++#define CONFIG_SYS_CBSIZE              1024
+ 
+ /* Print Buffer Size */
+ #define CONFIG_SYS_PBSIZE (CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
+@@ -166,7 +181,6 @@
+ 
+ #if defined(CONFIG_ENV_IS_IN_MMC)
+ #define CONFIG_ENV_OFFSET		(6 * 64 * 1024)
+-#define CONFIG_SYS_MMC_ENV_DEV		0
+ #endif
+ 
+ #define CONFIG_OF_LIBFDT
+Index: u-boot-2013.01/src/board/freescale/mx6qsabresd/mx6qsabresd.c
+===================================================================
+--- u-boot-2013.01.orig/src/board/freescale/mx6qsabresd/mx6qsabresd.c	2013-03-08 10:51:51.000000000 -0600
++++ u-boot-2013.01/src/board/freescale/mx6qsabresd/mx6qsabresd.c	2013-06-19 11:42:23.949059194 -0600
+@@ -86,6 +86,20 @@
+ 	gpio_set_value(IMX_GPIO_NR(1, 25), 1);
+ }
+ 
++iomux_v3_cfg_t const usdhc2_pads[] = {
++	MX6Q_PAD_SD2_CLK__USDHC2_CLK   | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD2_CMD__USDHC2_CMD   | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD2_DAT0__USDHC2_DAT0 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD2_DAT1__USDHC2_DAT1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD2_DAT2__USDHC2_DAT2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD2_DAT3__USDHC2_DAT3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_NANDF_D4__USDHC2_DAT4 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_NANDF_D5__USDHC2_DAT5 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_NANDF_D6__USDHC2_DAT6 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_NANDF_D7__USDHC2_DAT7 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_NANDF_D2__GPIO_2_2    | MUX_PAD_CTRL(NO_PAD_CTRL), /* CD */
++};
++
+ iomux_v3_cfg_t const usdhc3_pads[] = {
+ 	MX6Q_PAD_SD3_CLK__USDHC3_CLK   | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+ 	MX6Q_PAD_SD3_CMD__USDHC3_CMD   | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+@@ -100,28 +114,82 @@
+ 	MX6Q_PAD_NANDF_D0__GPIO_2_0    | MUX_PAD_CTRL(NO_PAD_CTRL), /* CD */
+ };
+ 
++iomux_v3_cfg_t const usdhc4_pads[] = {
++	MX6Q_PAD_SD4_CLK__USDHC4_CLK   | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD4_CMD__USDHC4_CMD   | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD4_DAT0__USDHC4_DAT0 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD4_DAT1__USDHC4_DAT1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD4_DAT2__USDHC4_DAT2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD4_DAT3__USDHC4_DAT3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD4_DAT4__USDHC4_DAT4 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD4_DAT5__USDHC4_DAT5 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD4_DAT6__USDHC4_DAT6 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++	MX6Q_PAD_SD4_DAT7__USDHC4_DAT7 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
++};
++
+ static void setup_iomux_uart(void)
+ {
+ 	imx_iomux_v3_setup_multiple_pads(uart1_pads, ARRAY_SIZE(uart1_pads));
+ }
+ 
+ #ifdef CONFIG_FSL_ESDHC
+-struct fsl_esdhc_cfg usdhc_cfg[1] = {
++struct fsl_esdhc_cfg usdhc_cfg[3] = {
++	{USDHC2_BASE_ADDR},
+ 	{USDHC3_BASE_ADDR},
++	{USDHC4_BASE_ADDR},
+ };
+ 
++#define USDHC2_CD_GPIO	IMX_GPIO_NR(2, 2)
++#define USDHC3_CD_GPIO	IMX_GPIO_NR(2, 0)
++
+ int board_mmc_getcd(struct mmc *mmc)
+ {
+-	gpio_direction_input(IMX_GPIO_NR(2, 0));
+-	return !gpio_get_value(IMX_GPIO_NR(2, 0));
++	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
++
++	switch (cfg->esdhc_base) {
++	case USDHC2_BASE_ADDR:
++		return !gpio_get_value(USDHC2_CD_GPIO);
++	case USDHC3_BASE_ADDR:
++		return !gpio_get_value(USDHC3_CD_GPIO);
++	default:
++		return 1; /* eMMC/uSDHC4 is always present */
++	}
+ }
+ 
+ int board_mmc_init(bd_t *bis)
+ {
+-	imx_iomux_v3_setup_multiple_pads(usdhc3_pads, ARRAY_SIZE(usdhc3_pads));
++	int i;
++
++	for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++) {
++		switch (i) {
++		case 0:
++			imx_iomux_v3_setup_multiple_pads(
++				usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
++			gpio_direction_input(USDHC2_CD_GPIO);
++			usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
++			break;
++		case 1:
++			imx_iomux_v3_setup_multiple_pads(
++				usdhc3_pads, ARRAY_SIZE(usdhc3_pads));
++			gpio_direction_input(USDHC3_CD_GPIO);
++			usdhc_cfg[1].sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
++			break;
++		case 2:
++			imx_iomux_v3_setup_multiple_pads(
++				usdhc4_pads, ARRAY_SIZE(usdhc4_pads));
++			usdhc_cfg[2].sdhc_clk = mxc_get_clock(MXC_ESDHC4_CLK);
++			break;
++		default:
++			printf("Warning: you configured more USDHC controllers"
++				"(%d) than supported by the board\n", i + 1);
++			return 0;
++	       }
++
++	       if (fsl_esdhc_initialize(bis, &usdhc_cfg[i]))
++			printf("Warning: failed to initialize mmc dev %d\n", i);
++	}
+ 
+-	usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
+-	return fsl_esdhc_initialize(bis, &usdhc_cfg[0]);
++	return 0;
+ }
+ #endif
+ 
+Index: u-boot-2013.01/src/include/configs/mx6qsabresd.h
+===================================================================
+--- u-boot-2013.01.orig/src/include/configs/mx6qsabresd.h	2013-03-08 10:51:51.000000000 -0600
++++ u-boot-2013.01/src/include/configs/mx6qsabresd.h	2013-06-19 11:43:14.609059111 -0600
+@@ -25,4 +25,10 @@
+ 
+ #include "mx6qsabre_common.h"
+ 
++#define CONFIG_SYS_FSL_USDHC_NUM	3
++#if defined(CONFIG_ENV_IS_IN_MMC)
++#define CONFIG_SYS_MMC_ENV_DEV		1	/* SDHC3 */
++#define CONFIG_SYS_MMC_ENV_PART		1	/* Boot partition 1 */
++#endif
++
+ #endif                         /* __MX6QSABRESD_CONFIG_H */

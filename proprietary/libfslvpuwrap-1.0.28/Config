@@ -1,0 +1,7 @@
+config FS_APPS_LIB_FSL_VPU_WRAP_1_0_28
+	bool "libfslvpuwrap 1.0.28"
+	select FS_APPS_GSTREAMER
+	help
+	This option enabled the core good plugins for gstreamer that
+	doesn't have external dependencies on other libraries
+

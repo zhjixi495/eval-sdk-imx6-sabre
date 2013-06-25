@@ -1,0 +1,13 @@
+config UBOOT_NETWORKING
+	bool
+	default y
+
+config UBOOT_UPGRADE_BOOTLOADER_ADDR
+	string
+	default "0x12000000"
+
+config UBOOT_SPI_FLASH_MEMORY
+	bool
+	default y
+
+

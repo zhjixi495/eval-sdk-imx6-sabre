@@ -1,0 +1,7 @@
+config FS_APPS_LIB_FSL_CODEC_3_0_5
+	bool "libfslcodec 3.0.5"
+        select FS_APPS_GSTREAMER
+	help
+	This option enabled the core good plugins for gstreamer that
+	doesn't have external dependencies on other libraries
+

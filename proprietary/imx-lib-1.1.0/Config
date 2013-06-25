@@ -1,0 +1,6 @@
+config FS_APPS_IMX_LIB_1_1_0
+	bool "imx-lib 1.1.0"
+	help
+	This option enabled the core good plugins for gstreamer that
+	doesn't have external dependencies on other libraries
+

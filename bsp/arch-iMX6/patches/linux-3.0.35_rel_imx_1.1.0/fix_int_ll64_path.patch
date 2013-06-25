@@ -1,0 +1,13 @@
+Index: kernel/linux-3.0.35/include/asm-generic/int-ll64.h
+===================================================================
+--- kernel.orig/linux-3.0.35/include/asm-generic/int-ll64.h	2013-03-08 10:26:05.000000000 -0600
++++ kernel/linux-3.0.35/include/asm-generic/int-ll64.h	2013-03-26 09:26:00.797999322 -0600
+@@ -8,7 +8,7 @@
+ #ifndef _ASM_GENERIC_INT_LL64_H
+ #define _ASM_GENERIC_INT_LL64_H
+ 
+-#include <asm/bitsperlong.h>
++#include <asm-generic/bitsperlong.h>
+ 
+ #ifndef __ASSEMBLY__
+ /*

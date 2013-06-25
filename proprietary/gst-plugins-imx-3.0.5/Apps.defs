@@ -1,0 +1,1 @@
+GST_PLUGINS_IMX=$(DEVDIR)/proprietary/gst-plugins-imx-3.0.5

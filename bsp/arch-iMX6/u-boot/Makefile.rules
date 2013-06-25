@@ -1,0 +1,57 @@
+#$L$
+# Copyright (C) 2011 Ridgerun (http://www.ridgerun.com). 
+#$L$
+
+ifeq ($(DEVDIR),)
+$(error ====== DEVDIR variable is empty, invoke this Makefile from the BSP root, or provide the path to it =====)
+endif
+include $(DEVDIR)/bsp/mach/Make.conf
+
+.PHONY: arch_clean arch_build 
+
+QUICK_BOOT_CMDLINE_ARGS=quiet lpj=4931584
+
+soft_clean:
+	if [ -d src ] ; then \
+	$(MAKE) -C src CROSS_COMPILE=$(TOOLCHAIN_PREFIX)- distclean ; \
+	fi ; 
+	rm -f uboot_configured uboot_built reflags reflags.tmp .fsloadhex
+
+
+gen_uboot_flashbin: 
+	$(MAKE) soft_clean build
+ifeq ($(CONFIG_UBOOT_NAND_FLASH_MEMORY),y)
+	$(V) ln -sf $(IMAGES)/bootloader $(IMAGES)/bootloader.nandbin
+endif
+	touch $@
+
+arch_build:
+ifeq ($(CONFIG_INSTALLER_MODE_SD_CARD),y)
+	$(MAKE) soft_clean
+	$(MAKE) cmdline
+	touch $@
+endif
+
+cmdline:
+ifeq ($(CONFIG_UBOOT_QUICK_BOOT),y)
+	$(V) if ! grep -q "$(QUICK_BOOT_CMDLINE_ARGS)" $(CMDLINEFILE) ; then \
+	        echo -n " $(QUICK_BOOT_CMDLINE_ARGS) " >> $(CMDLINEFILE) ; \
+	     fi
+endif
+
+arch_clean:usb_loader_clear
+	$(V) rm -rf arch_build gen_uboot_flashbin
+
+#arch_post_build:usb_loader_build
+arch_post_build:
+
+# iMX6 uses a .imx image instead of the .bin (imx image is a .bin image with a special header that is required 
+# in order to have an image that can be read by imx ROM Bootloader)
+copy_images::
+	$(V) cp src/u-boot.imx src/u-boot.bin
+
+usb_loader_build:
+	$(MAKE) -C arch/usb_loader
+
+usb_loader_clear:
+#	$(MAKE) -C arch/usb_loader clean

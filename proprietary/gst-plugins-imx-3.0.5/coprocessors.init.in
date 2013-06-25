@@ -1,0 +1,35 @@
+#!/bin/sh
+
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
+case "$1" in
+  start)
+	echo "Loading coprocessors modules..."
+	if [ -f lib/modules/@KERNELVERSION@/kernel/drivers/media/video/mxc/capture/ov5642_camera.ko ] ; then
+	    rmmod ov5642_camera 2>/dev/null || true
+	    modprobe ov5642_camera
+	fi
+	if [ -f lib/modules/@KERNELVERSION@/kernel/drivers/media/video/mxc/capture/mxc_v4l2_capture.ko ] ; then
+	    rmmod mxc_v4l2_capture 2>/dev/null || true
+	    modprobe mxc_v4l2_capture
+	fi
+	if [ -f lib/modules/@KERNELVERSION@/kernel/drivers/media/video/mxc/capture/ov5640_camera_mipi.ko ] ; then
+	    rmmod ov5640_camera_mipi 2>/dev/null || true
+	    modprobe ov5640_camera_mipi
+	fi
+  ;;
+  stop)
+	if lsmod | grep -q mxc_v4l2_capture ; then
+	    rmmod mxc_v4l2_capture || true
+	fi
+	if lsmod | grep -q ov5642_camera  ; then
+	    rmmod ov5642_camera  || true
+	fi
+	if lsmod | grep -q ov5640_camera_mipi  ; then
+	    rmmod ov5640_camera_mipi  || true
+	fi
+  ;;
+  *)
+    echo "$0 {start|stop}"
+  ;;
+esac

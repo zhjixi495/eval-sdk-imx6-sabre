@@ -1,0 +1,7 @@
+config FS_APPS_BOOST
+	bool "Boost 1.52.0"
+	default n
+	help
+	  Boost C++ libraries
+
+

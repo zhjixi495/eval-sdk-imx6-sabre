@@ -1,0 +1,57 @@
+Index: busybox/src/Config.in
+===================================================================
+--- busybox.orig/src/Config.in	2012-06-26 15:35:45.000000000 +0200
++++ busybox/src/Config.in	2012-08-03 08:11:21.449822399 +0200
+@@ -3,7 +3,7 @@
+ # see scripts/kbuild/config-language.txt.
+ #
+ 
+-mainmenu "BusyBox Configuration"
++#mainmenu "BusyBox Configuration"
+ 
+ config HAVE_DOT_CONFIG
+ 	bool
+Index: busybox/src/miscutils/Config.src
+===================================================================
+--- busybox.orig/src/miscutils/Config.src	2012-06-26 15:35:45.000000000 +0200
++++ busybox/src/miscutils/Config.src	2012-08-03 08:11:21.453822437 +0200
+@@ -503,7 +503,7 @@
+ 	  As readahead(2) blocks until each file has been read, it is best to
+ 	  run this applet as a background job.
+ 
+-config RFKILL
++config BB_RFKILL
+ 	bool "rfkill"
+ 	default n  # doesn't build on Ubuntu 9.04
+ 	select PLATFORM_LINUX
+Index: busybox/src/miscutils/Kbuild.src
+===================================================================
+--- busybox.orig/src/miscutils/Kbuild.src	2012-06-26 15:35:45.000000000 +0200
++++ busybox/src/miscutils/Kbuild.src	2012-08-03 08:11:21.453822437 +0200
+@@ -1,4 +1,3 @@
+-# Makefile for busybox
+ #
+ # Copyright (C) 1999-2005 by Erik Andersen <andersen@codepoet.org>
+ #
+@@ -36,7 +35,7 @@
+ lib-$(CONFIG_MT)          += mt.o
+ lib-$(CONFIG_RAIDAUTORUN) += raidautorun.o
+ lib-$(CONFIG_READAHEAD)   += readahead.o
+-lib-$(CONFIG_RFKILL)      += rfkill.o
++lib-$(CONFIG_BB_RFKILL)      += rfkill.o
+ lib-$(CONFIG_RUNLEVEL)    += runlevel.o
+ lib-$(CONFIG_RX)          += rx.o
+ lib-$(CONFIG_SETSID)      += setsid.o
+Index: busybox/src/include/applets.src.h
+===================================================================
+--- busybox.orig/src/include/applets.src.h	2012-07-02 16:08:25.000000000 +0200
++++ busybox/src/include/applets.src.h	2012-08-03 08:12:35.390183967 +0200
+@@ -297,7 +297,7 @@
+ IF_RESET(APPLET(reset, BB_DIR_USR_BIN, BB_SUID_DROP))
+ IF_RESIZE(APPLET(resize, BB_DIR_USR_BIN, BB_SUID_DROP))
+ IF_RESTORECON(APPLET_ODDNAME(restorecon, setfiles, BB_DIR_SBIN, BB_SUID_DROP, restorecon))
+-IF_RFKILL(APPLET(rfkill, BB_DIR_USR_SBIN, BB_SUID_DROP))
++IF_BB_RFKILL(APPLET(rfkill, BB_DIR_USR_SBIN, BB_SUID_DROP))
+ IF_RM(APPLET_NOFORK(rm, rm, BB_DIR_BIN, BB_SUID_DROP, rm))
+ IF_RMDIR(APPLET_NOFORK(rmdir, rmdir, BB_DIR_BIN, BB_SUID_DROP, rmdir))
+ IF_ROUTE(APPLET(route, BB_DIR_SBIN, BB_SUID_DROP))

@@ -1,0 +1,16 @@
+config FS_APPS_GSTREAMER_PLUGINS_IMX_0_10_35
+	bool "gstreamer-plugins-imx 0.10.35"
+	select FS_APPS_GSTREAMER_PLUGINS_BASE
+	select FS_APPS_GSTREAMER
+	select FS_APPS_IMX_LIB_1_1_0
+	select FS_APPS_LIB_FSL_CODEC_3_0_5
+	select FS_APPS_LIB_FSL_PARSER_3_0_5
+	select FS_APPS_LIB_FSL_VPU_WRAP_1_0_28
+	select FS_APPS_FIRMWARE_IMX_1_1_0
+	select FS_APPS_GSTREAMER_PLUGINS_BAD
+	select FS_APPS_GSTREAMER_PLUGINS_GOOD_0_10_31
+	select FS_APPS_GSTREAMER_PLUGINS_UGLY
+	help
+	This option enabled the core good plugins for gstreamer that
+	doesn't have external dependencies on other libraries
+

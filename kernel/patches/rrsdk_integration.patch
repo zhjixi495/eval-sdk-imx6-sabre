@@ -1,0 +1,116 @@
+Index: kernel/linux-3.0.35/drivers/i2c/algos/Kconfig
+===================================================================
+--- kernel.orig/linux-3.0.35/drivers/i2c/algos/Kconfig	2013-03-08 10:25:59.000000000 -0600
++++ kernel/linux-3.0.35/drivers/i2c/algos/Kconfig	2013-05-09 13:20:08.286678919 -0600
+@@ -3,7 +3,7 @@
+ #
+ 
+ menu "I2C Algorithms"
+-	visible if !I2C_HELPER_AUTO
++	depends on !I2C_HELPER_AUTO
+ 
+ config I2C_ALGOBIT
+ 	tristate "I2C bit-banging interfaces"
+Index: kernel/linux-3.0.35/drivers/media/common/tuners/Kconfig
+===================================================================
+--- kernel.orig/linux-3.0.35/drivers/media/common/tuners/Kconfig	2013-03-08 10:25:59.000000000 -0600
++++ kernel/linux-3.0.35/drivers/media/common/tuners/Kconfig	2013-05-09 13:20:08.290678919 -0600
+@@ -45,7 +45,7 @@
+ 	  If unsure say N.
+ 
+ menu "Customize TV tuners"
+-	visible if MEDIA_TUNER_CUSTOMISE
++	depends on MEDIA_TUNER_CUSTOMISE
+ 
+ config MEDIA_TUNER_SIMPLE
+ 	tristate "Simple tuner support"
+Index: kernel/linux-3.0.35/drivers/media/dvb/frontends/Kconfig
+===================================================================
+--- kernel.orig/linux-3.0.35/drivers/media/dvb/frontends/Kconfig	2013-03-08 10:25:59.000000000 -0600
++++ kernel/linux-3.0.35/drivers/media/dvb/frontends/Kconfig	2013-05-09 13:20:08.290678919 -0600
+@@ -13,7 +13,7 @@
+ 	  If unsure say N.
+ 
+ menu "Customise DVB Frontends"
+-	visible if DVB_FE_CUSTOMISE
++	depends on DVB_FE_CUSTOMISE
+ 
+ comment "Multistandard (satellite) frontends"
+ 	depends on DVB_CORE
+Index: kernel/linux-3.0.35/drivers/media/video/Kconfig
+===================================================================
+--- kernel.orig/linux-3.0.35/drivers/media/video/Kconfig	2013-03-08 10:25:59.000000000 -0600
++++ kernel/linux-3.0.35/drivers/media/video/Kconfig	2013-05-09 13:20:08.290678919 -0600
+@@ -129,7 +129,7 @@
+ #
+ 
+ menu "Encoders, decoders, sensors and other helper chips"
+-	visible if !VIDEO_HELPER_CHIPS_AUTO
++	depends on !VIDEO_HELPER_CHIPS_AUTO
+ 
+ comment "Audio decoders, processors and mixers"
+ 
+Index: kernel/linux-3.0.35/drivers/staging/echo/Kconfig
+===================================================================
+--- kernel.orig/linux-3.0.35/drivers/staging/echo/Kconfig	2013-03-08 10:26:00.000000000 -0600
++++ kernel/linux-3.0.35/drivers/staging/echo/Kconfig	2013-05-09 13:20:08.290678919 -0600
+@@ -1,4 +1,4 @@
+-config ECHO
++config ECHOLINE
+ 	tristate "Line Echo Canceller support"
+ 	default n
+ 	---help---
+Index: kernel/linux-3.0.35/drivers/staging/echo/Makefile
+===================================================================
+--- kernel.orig/linux-3.0.35/drivers/staging/echo/Makefile	2013-03-08 10:26:00.000000000 -0600
++++ kernel/linux-3.0.35/drivers/staging/echo/Makefile	2013-05-09 13:20:08.290678919 -0600
+@@ -1 +1 @@
+-obj-$(CONFIG_ECHO) += echo.o
++obj-$(CONFIG_ECHOLINE) += echo.o
+Index: kernel/linux-3.0.35/drivers/net/tokenring/Kconfig
+===================================================================
+--- kernel.orig/linux-3.0.35/drivers/net/tokenring/Kconfig	2013-03-08 10:26:00.000000000 -0600
++++ kernel/linux-3.0.35/drivers/net/tokenring/Kconfig	2013-05-09 13:20:08.290678919 -0600
+@@ -3,7 +3,7 @@
+ #
+ 
+ # So far, we only have PCI, ISA, and MCA token ring devices
+-menuconfig TR
++menuconfig TOKERING
+ 	tristate "Token Ring driver support"
+ 	depends on NETDEVICES && !UML
+ 	depends on (PCI || ISA || MCA || CCW)
+@@ -18,7 +18,7 @@
+ 	  from <http://www.tldp.org/docs.html#howto>. Most people can
+ 	  say N here.
+ 
+-if TR
++if TOKERING
+ 
+ config IBMTR
+ 	tristate "IBM Tropic chipset based adapter support"
+@@ -182,4 +182,4 @@
+ 	  To compile this driver as a module, choose M here: the module will be
+ 	  called smctr.
+ 
+-endif # TR
++endif # TOKERING
+Index: kernel/linux-3.0.35/Makefile
+===================================================================
+--- kernel.orig/linux-3.0.35/Makefile	2013-03-08 10:25:57.000000000 -0600
++++ kernel/linux-3.0.35/Makefile	2013-05-09 13:20:08.290678919 -0600
+@@ -1,7 +1,7 @@
+ VERSION = 3
+ PATCHLEVEL = 0
+ SUBLEVEL = 35
+-EXTRAVERSION =
++EXTRAVERSION =-ridgerun
+ NAME = Sneaky Weasel
+ 
+ # *DOCUMENTATION*
+Index: kernel/linux-3.0.35/localversion
+===================================================================
+--- kernel.orig/linux-3.0.35/localversion	2013-03-08 10:26:06.000000000 -0600
++++ /dev/null	1970-01-01 00:00:00.000000000 +0000
+@@ -1 +0,0 @@
+--2026-geaaf30e

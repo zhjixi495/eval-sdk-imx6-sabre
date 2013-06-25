@@ -1,0 +1,74 @@
+#
+# Ridgerun BSP Configuration file for toolchain
+# all definitions on this subtree must prefix with TOOLCHAIN_
+#
+
+menu "Toolchain configurations"
+
+choice
+	prompt "Toolchain path scope"
+
+config TOOLCHAIN_PATH_GLOBAL
+	bool "Toolchain binaries path global"
+	help
+	     Global path on the file system of the toolchain libraries
+
+config TOOLCHAIN_PATH_PER_COMPONENT
+	bool "Path of the toolchain binaries, bootloader and kernel"
+	help
+	     Enter the path on the file system of the kernel toolchain, bootloader toolchain and
+	     the toolchain binaries
+
+endchoice
+
+config BOOTLOADER_TOOLCHAIN_PATH
+        string "Bootloader Toolchain binaries path"
+        default "/opt/codesourcery/arm-2009q1"
+	depends on TOOLCHAIN_PATH_PER_COMPONENT
+        help
+             Path on the file system to bootloader toolchain, some recent versions of codesourcery \
+             toolchain cause u-boot to fail during compilation
+ 
+config KERNEL_TOOLCHAIN_PATH
+        string "Kernel Toolchain binaries path"
+        default "/opt/codesourcery/arm-2009q1"
+	depends on TOOLCHAIN_PATH_PER_COMPONENT
+        help
+           Path on the file system to kernel toolchain, some recent versions of codesourcery \
+           toolchain cause the kernel to fail during compilation
+
+config TOOLCHAIN_PATH
+        string "Toolchain binaries path"
+        default "/opt/codesourcery/arm-2009q1"
+	depends on TOOLCHAIN_PATH_GLOBAL || TOOLCHAIN_PATH_PER_COMPONENT
+        help
+            Path on the file system of the toolchain binaries
+
+
+config TOOLCHAIN_NOARCH_FLAGS
+	string "Toolchain architecture independent flags"
+	default "-Wall -Os"
+	help
+	    Toolchain architecture independent flags
+
+source bsp/mach/ConfigToolchain
+
+config TOOLCHAIN_SIMULATOR_FLAGS
+	string "Flags to use when compiling code to simulate on host machine"
+	default "-Os -Wall"
+
+config TOOLCHAIN_DEPENDENY_ON_FUTEX
+	bool
+	default y
+	select FUTEX # This toolchain is NPTL, and requires futex support on the kernel
+
+config TOOLCHAIN_CCACHE
+	bool "Use ccache while compiling"
+	default y
+	help
+		Using ccache usually will make recompilations faster.
+		Project homepage:
+		http://ccache.samba.org/
+
+endmenu
+

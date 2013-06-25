@@ -1,0 +1,14 @@
+Index: cups-1.6.2/src/ppdc/Makefile
+===================================================================
+--- cups-1.6.2.orig/src/ppdc/Makefile	2012-01-20 13:00:32.000000000 -0600
++++ cups-1.6.2/src/ppdc/Makefile	2013-06-04 08:55:02.413281530 -0600
+@@ -69,8 +69,7 @@
+ 
+ TARGETS	=	\
+ 		$(LIBTARGETS) \
+-		$(EXECTARGETS) \
+-		genstrings
++		$(EXECTARGETS)
+ 
+ 
+ #

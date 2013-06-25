@@ -1,0 +1,9 @@
+config FS_APPS_LIB_FSL_AACP_CODEC_3_0_5
+	bool "libfslaacpcodec 3.0.5"
+	select FS_APPS_GSTREAMER
+	select FS_APPS_GSTREAMER_PLUGINS_BAD
+	select FS_APPS_GSTREAMER_PLUGINS_BASE
+	help
+	This option enabled the core good plugins for gstreamer that
+	doesn't have external dependencies on other libraries
+

@@ -1,0 +1,13 @@
+Index: cups-1.6.2/src/man/Makefile
+===================================================================
+--- cups-1.6.2.orig/src/man/Makefile	2012-11-26 12:26:01.000000000 -0600
++++ cups-1.6.2/src/man/Makefile	2013-06-04 09:01:21.993282988 -0600
+@@ -72,7 +72,7 @@
+ # Make everything...
+ #
+ 
+-all:	$(MAN1) $(MAN5) $(MAN7) $(MAN8) html
++all:	$(MAN1) $(MAN5) $(MAN7) $(MAN8)
+ 
+ 
+ #
