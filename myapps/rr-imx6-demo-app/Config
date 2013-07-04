@@ -1,0 +1,5 @@
+config USER_APPS_R_IMX6_DEMO_APP
+	bool "iMX6 Demo application"
+	select FS_APPS_GSTD
+	default n
+
